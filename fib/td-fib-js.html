@@ -1,0 +1,175 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+		<title>fib</title>
+		<style type="text/css" media="screen">
+			pre {
+				font-size: 1.5em;
+			}
+			
+			.log {
+				color: red;
+			}
+		</style>
+		<script type="text/javascript" charset="utf-8">
+			function fib (n) {
+				return (n < 2) ? n : fib(n - 1) + fib(n - 2);
+			}
+			
+			function fibAcc (n) {
+				var l, c = [0, 1];
+				
+				function f (n) {
+					if (n < 2) {
+						return c[c.length - 1];
+					} else {
+						l = c.length;
+						c[l] = c[l - 1] + c[l - 2];
+						return f(n - 1);
+					}
+				}
+				
+				return f(n);
+			}
+			
+			function fibLoop (n) {
+				var l, c = [0, 1];
+				while (n >= c.length) {
+					l = c.length;
+					c[l] = c[l - 1] + c[l - 2];
+				}
+				return c[n];
+			}
+			
+			function fibCache (n) {
+				var l, c = fibCache.cache;
+				while (n >= c.length) {
+					l = c.length;
+					c[l] = c[l - 1] + c[l - 2];
+				}
+				return c[n];
+			}
+			
+			fibCache.cache = [0, 1];
+			
+			function calcFib () {
+				var n = parseInt(document.getElementById("seq1").value, 10);
+				var i = parseInt(document.getElementById("it1").value, 10);
+				log("l1", fib, n, i);
+			}
+			
+			function calcFibAcc () {
+				var n = parseInt(document.getElementById("seq1b").value, 10);
+				var i = parseInt(document.getElementById("it1b").value, 10);
+				log("l1b", fibAcc, n, i);
+			}
+			
+			function calcFibLoop () {
+				var n = parseInt(document.getElementById("seq2").value, 10);
+				var i = parseInt(document.getElementById("it2").value, 10);
+				log("l2", fibLoop, n, i);
+			}
+			
+			function calcFibCache () {
+				fibCache.cache = [0, 1]; // reset cache
+				var n = parseInt(document.getElementById("seq3").value, 10);
+				var i = parseInt(document.getElementById("it3").value, 10);
+				log("l3", fibCache, n, i);
+			}
+			
+			function log (el, f, n, i) {
+				var el = document.getElementById(el);
+				el.innerHTML = "one moment...";
+				setTimeout(function () {
+					var start = new Date().getTime();
+					while (i--) {
+						var fib = f.call(null, n);
+					}
+					var end = new Date().getTime();
+					var result = "fib " + n + " = " + fib + ", duration = " + (end - start) + "ms";
+					el.innerHTML = result;
+				}, 500);
+			}
+			
+		</script>
+	</head>
+	<body>
+<h1>Fibonacci (recursive, non-optimized)</h1>
+<pre>
+function fib (n) {
+	return (n < 2) ? n : fib(n - 1) + fib(n - 2);
+}
+</pre>
+
+<div id="l1" class="log"></div>
+<p>
+	Seq: <input type="text" id="seq1" value="20" /> Iterations: <input type="text" id="it1" value="1" /> <button onclick="calcFib()">Calculate</button> WARNING: THIS IS SUPER SLOW! IN FIREFOX, ONE ITERATION OF SEQ 35 TAKES ALMOST 20 SECONDS!
+</p>
+
+
+<h1>Fibonacci (recursive, with accumulator)</h1>
+<pre>
+function fibAcc (n) {
+	var l, c = [0, 1];
+	
+	function f (n) {
+		if (n < 2) {
+			return c[c.length - 1];
+		} else {
+			l = c.length;
+			c[l] = c[l - 1] + c[l - 2];
+			return f(n - 1);
+		}
+	}
+	
+	return f(n);
+}
+</pre>
+
+<div id="l1b" class="log"></div>
+<p>
+	Seq: <input type="text" id="seq1b" value="1476" /> Iterations: <input type="text" id="it1b" value="10000" /> <button onclick="calcFibAcc()">Calculate</button>
+</p>
+
+
+<h1>Fibonacci (non-recursive)</h1>
+<pre>
+function fibLoop (n) {
+	var l, c = [0, 1];
+	while (n >= c.length) {
+		l = c.length;
+		c[l] = c[l - 1] + c[l - 2];
+	}
+	return c[n];
+}
+</pre>
+
+<div id="l2" class="log"></div>
+<p>
+	Seq: <input type="text" id="seq2" value="1476" /> Iterations: <input type="text" id="it2" value="10000" /> <button onclick="calcFibLoop()">Calculate</button>
+</p>
+
+
+<h1>Fibonacci (non-recursive, with caching)</h1>
+<pre>
+function fibCache (n) {
+	var l, c = fibCache.cache;
+	while (n >= c.length) {
+		l = c.length;
+		c[l] = c[l - 1] + c[l - 2];
+	}
+	return c[n];
+}
+
+fibCache.cache = [0, 1];
+</pre>
+
+<div id="l3" class="log"></div>
+<p>
+	Seq: <input type="text" id="seq3" value="1476" /> Iterations: <input type="text" id="it3" value="10000" /> <button onclick="calcFibCache()">Calculate</button>
+</p>
+
+
+	</body>
+</html>
