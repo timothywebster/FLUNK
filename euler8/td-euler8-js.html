@@ -35,7 +35,10 @@
 				var a = n.split(""), // convert number string to array
 					s = [],
 					tmp = [],
-					max = [[], 0];
+					max = {
+						seq: [],
+						product: 0
+					};
 					
 				while (a.length > 4) {
 					tmp = a.slice(-5);
@@ -46,9 +49,9 @@
 				}
 				
 				s.map(function (current, i) { // grab the max product value from the array of digits and products
-					if (current[1] > max[1]) {
-						max[0] = current[0];
-						max[1] = current[1];
+					if (current[1] > max.product) {
+						max.seq = current[0];
+						max.product = current[1];
 					}
 				});
 				
@@ -160,7 +163,7 @@
 					if (typeof p === "number") {
 						result = "max product = " + p + ", duration = " + (end - start) + "ms";
 					} else {
-						result = "max product = " + p[1] + ", sequence = " + p[0].join("") + ", duration = " + (end - start) + "ms";
+						result = "max product = " + p.product + ", sequence = " + p.seq.join("") + ", duration = " + (end - start) + "ms";
 					}
 					el.innerHTML = result;
 				}, 500);
@@ -221,7 +224,10 @@ function maxProductAndSequence () {
 	var a = n.split(""), // convert number string to array
 		s = [],
 		tmp = [],
-		max = [[], 0];
+		max = {
+			seq: [],
+			product: 0
+		};
 		
 	while (a.length > 4) {
 		tmp = a.slice(-5);
@@ -232,9 +238,9 @@ function maxProductAndSequence () {
 	}
 	
 	s.map(function (current, i) { // grab the max product value from the array of digits and products
-		if (current[1] > max[1]) {
-			max[0] = current[0];
-			max[1] = current[1];
+		if (current[1] > max.product) {
+			max.seq = current[0];
+			max.product = current[1];
 		}
 	});
 	
@@ -243,7 +249,6 @@ function maxProductAndSequence () {
 </pre>
 
 <div id="l2" class="log"></div>
-
 <p>
 	Iterations: <input type="text" id="it2" value="100" /> <button onclick="calcMaxProductAndSequence()">Calculate</button>
 </p>
