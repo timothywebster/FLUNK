@@ -1,1 +1,20 @@
 git repository for Functional Language User Network of Kalamazoo (FLUNK) interest group
+
+If you would like to use the FLUNK repo for your code, get a github user id, follow the instructions for getting git and your ssh key, etc. and have me set you up as a collaborator.  
+
+How to get your own local copy of the repo
+$ git clone git@github.com:timothywebster/FLUNK.git
+
+Let your cloned repo know who you are
+$  git config --global user.email "your email address"
+$  git config --global user.name "Your Name"
+
+How to add your own file:
+$  git add <your filename>
+$  git commit -m "your helpful commit message here"
+$  git push origin master
+
+How to update your file:
+$  git commit -a -m "adding more helpful comments"
+$  git push origin master
+
