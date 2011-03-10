@@ -31,6 +31,8 @@
 				});
 			}
 			
+			// if the JS-engine is missing Array.reduce, add it
+			// https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/reduce
 			if (!Array.prototype.reduce)
 			{
 			  Array.prototype.reduce = function(fun /*, initialValue */)
@@ -83,6 +85,7 @@
 			  };
 			}
 			
+			// helper functions for executing and logging
 			function calcMaxProduct () {
 				var i = parseInt(document.getElementById("it1").value, 10);
 				log("l1", maxProduct, i);
