@@ -9,12 +9,15 @@ Let your cloned repo know who you are
 $  git config --global user.email "your email address"
 $  git config --global user.name "Your Name"
 
+How to update your clone of the repo:
+$ git pull
+
 How to add your own file:
 $  git add <your filename>
 $  git commit -m "your helpful commit message here"
-$  git push origin master
+$  git push 
 
-How to update your file:
+How to change your file in the repo:
 $  git commit -a -m "adding more helpful comments"
-$  git push origin master
+$  git push 
 
