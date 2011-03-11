@@ -24,6 +24,11 @@
 ; put it all together
 (apply max (map calc (part *string* '())))
 
+
+; also get the digits, even though it is not in the spec. The method below is not very efficient...we could do all of the work
+; in one pass through the string, but efficiency is not really an issue here, and I think passing the max product around in the
+; function signature starts to make the function difficult to read
+
 ; build an association list of digits + products...don't use a hash, in case there are duplicate runs of digits
 (defn make-pairs [parts acc]
      (cond (empty? parts) acc
