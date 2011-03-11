@@ -31,6 +31,33 @@
 				});
 			}
 			
+			function maxProductAndSequence () {
+				var a = n.split(""), // convert number string to array
+					s = [],
+					tmp = [],
+					max = {
+						seq: [],
+						product: 0
+					};
+					
+				while (a.length > 4) {
+					tmp = a.slice(-5);
+					s.push([tmp, tmp.reduce(function (previous, current) { // grab 5 digits at a time, calculate product, push into new array along with the 5 digits
+						return previous * current;
+					})]);
+					a.pop(); // shorten array by one element
+				}
+				
+				s.map(function (current, i) { // grab the max product value from the array of digits and products
+					if (current[1] > max.product) {
+						max.seq = current[0];
+						max.product = current[1];
+					}
+				});
+				
+				return max;
+			}
+			
 			// if the JS-engine is missing Array.reduce, add it
 			// https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/reduce
 			if (!Array.prototype.reduce)
@@ -85,14 +112,47 @@
 			  };
 			}
 			
+			// if the JS-engine is missing Array.map, add it
+			// https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/map
+			if (!Array.prototype.map)
+			{
+			  Array.prototype.map = function(fun /*, thisp */)
+			  {
+			    "use strict";
+			
+			    if (this === void 0 || this === null)
+			      throw new TypeError();
+			
+			    var t = Object(this);
+			    var len = t.length >>> 0;
+			    if (typeof fun !== "function")
+			      throw new TypeError();
+			
+			    var res = new Array(len);
+			    var thisp = arguments[1];
+			    for (var i = 0; i < len; i++)
+			    {
+			      if (i in t)
+			        res[i] = fun.call(thisp, t[i], i, t);
+			    }
+			
+			    return res;
+			  };
+			}
+			
 			// helper functions for executing and logging
 			function calcMaxProduct () {
 				var i = parseInt(document.getElementById("it1").value, 10);
 				log("l1", maxProduct, i);
 			}
 			
+			function calcMaxProductAndSequence () {
+				var i = parseInt(document.getElementById("it2").value, 10);
+				log("l2", maxProductAndSequence, i);
+			}
+			
 			function log (el, f, i) {
-				var el = document.getElementById(el);
+				var el = document.getElementById(el), result;
 				el.innerHTML = "one moment...";
 				setTimeout(function () {
 					var start = new Date().getTime();
@@ -100,7 +160,11 @@
 						var p = f.call(null);
 					}
 					var end = new Date().getTime();
-					var result = "max product = " + p + ", duration = " + (end - start) + "ms";
+					if (typeof p === "number") {
+						result = "max product = " + p + ", duration = " + (end - start) + "ms";
+					} else {
+						result = "max product = " + p.product + ", sequence = " + p.seq.join("") + ", duration = " + (end - start) + "ms";
+					}
 					el.innerHTML = result;
 				}, 500);
 			}
@@ -152,6 +216,41 @@ function maxProduct () {
 <div id="l1" class="log"></div>
 <p>
 	Iterations: <input type="text" id="it1" value="100" /> <button onclick="calcMaxProduct()">Calculate</button>
+</p>
+
+<h2>Version 2, returns the 5 digit sequence, as well as the product</h2>
+<pre>
+function maxProductAndSequence () {
+	var a = n.split(""), // convert number string to array
+		s = [],
+		tmp = [],
+		max = {
+			seq: [],
+			product: 0
+		};
+		
+	while (a.length > 4) {
+		tmp = a.slice(-5);
+		s.push([tmp, tmp.reduce(function (previous, current) { // grab 5 digits at a time, calculate product, push into new array along with the 5 digits
+			return previous * current;
+		})]);
+		a.pop(); // shorten array by one element
+	}
+	
+	s.map(function (current, i) { // grab the max product value from the array of digits and products
+		if (current[1] > max.product) {
+			max.seq = current[0];
+			max.product = current[1];
+		}
+	});
+	
+	return max;
+}
+</pre>
+
+<div id="l2" class="log"></div>
+<p>
+	Iterations: <input type="text" id="it2" value="100" /> <button onclick="calcMaxProductAndSequence()">Calculate</button>
 </p>
 
 
