@@ -23,3 +23,21 @@
 
 ; put it all together
 (apply max (map calc (part *string* '())))
+
+; build an association list of digits + products...don't use a hash, in case there are duplicate runs of digits
+(defn make-pairs [parts acc]
+     (cond (empty? parts) acc
+       :else (let [head (first parts)]
+       (recur (rest parts) (cons (list head (calc head)) acc)))))
+
+; print all pairs whose product = max product (only one run for the example string from project euler)
+(let [parts (part *string* '())
+      pairs (make-pairs parts '())
+      max-product (apply max (map second pairs))]
+ (filter #(= max-product (second %)) pairs))
+
+; interesting clojure features:
+; inline function syntax #(= "" %) does (defn [s] (= "" s))
+; java integration: (Integer/parseInt s) does java.lang.Integer.parseInt(s)
+; ->> is much like the |> in f#....it is a macro that rewrites a series of command so the the results of first feed into next
+; I feels like I spent more time typing the namespace of string libraries than doing anything else
