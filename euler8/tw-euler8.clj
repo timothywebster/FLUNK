@@ -1,16 +1,19 @@
+; interesting clojure features:
+; inline function syntax #(= "" %) does (defn [s] (= "" s))
+; java integration: (Integer/parseInt s) does java.lang.Integer.parseInt(s)
+; ->> is much like the |> in f#....it is a macro that rewrites a series of command so the the results of first feed into next
+; I feels like I spent more time typing the namespace of string libraries than doing anything else
+
 ; string libs
 (require 'clojure.contrib.string)
 
 (def *string* 
 "7316717653133062491922511967442657474235534919493496983520312774506326239578318016984801869478851843858615607891129494954595017379583319528532088055111254069874715852386305071569329096329522744304355766896648950445244523161731856403098711121722383113622298934233803081353362766142828064444866452387493035890729629049156044077239071381051585930796086670172427121883998797908792274921901699720888093776657273330010533678812202354218097512545405947522435258490771167055601360483958644670632441572215539753697817977846174064955149290862569321978468622482839722413756570560574902614079729686524145351004748216637048440319989000889524345065854122758866688116427171479924442928230863465674813919123162824586178664583591245665294765456828489128831426076900422421902267105562632111110937054421750694165896040807198403850962455444362981230987879927244284909188845801561660979191338754992005240636899125607176060588611646710940507754100225698315520005593572972571636269561882670428252483600823257530420752963450")
-  
+
+; helper functions for all version
+
 ; get the cdr of a string
 (defn str-rest [s] (clojure.contrib.string/tail (dec (count s)) s))
-
-; get each five-digit piece of the string
-(defn part [s acc]                                                           
-  (cond (< (count s) 5) acc
-        :else (recur (str-rest s) (cons (clojure.contrib.string/take 5 s) acc)))) 
 
 ; convert 5-digit string to product of digits
 (defn calc [s]
@@ -21,13 +24,23 @@
 	(reduce *))                                     ; multiply them all
 )                                            
 
+;
+; simple version that only returns product, per problem spec
+;
+
+; get each five-digit piece of the string
+(defn part [s acc]                                                           
+  (cond (< (count s) 5) acc
+        :else (recur (str-rest s) (cons (clojure.contrib.string/take 5 s) acc)))) 
+
 ; put it all together
 (apply max (map calc (part *string* '())))
 
 
-; also get the digits, even though it is not in the spec. The method below is not very efficient...we could do all of the work
-; in one pass through the string, but efficiency is not really an issue here, and I think passing the max product around in the
-; function signature starts to make the function difficult to read
+;
+; added the ability to return digits as well, using the list that we built in the simple version
+; this approach makes several passes through the list, so it is not very efficient
+;
 
 ; build an association list of digits + products...don't use a hash, in case there are duplicate runs of digits
 (defn make-pairs [parts acc]
@@ -41,8 +54,18 @@
       max-product (apply max (map second pairs))]
  (filter #(= max-product (second %)) pairs))
 
-; interesting clojure features:
-; inline function syntax #(= "" %) does (defn [s] (= "" s))
-; java integration: (Integer/parseInt s) does java.lang.Integer.parseInt(s)
-; ->> is much like the |> in f#....it is a macro that rewrites a series of command so the the results of first feed into next
-; I feels like I spent more time typing the namespace of string libraries than doing anything else
+
+;
+; the shame was too great, so I did a  one-pass version that returns digits
+;
+
+(defn eff [s acc maxprod]                                                           
+  (cond (< (count s) 5) acc
+        :else (let [digits (clojure.contrib.string/take 5 s)
+                    prod (calc digits)
+                    pair (list digits prod)]
+                (cond (> prod maxprod) (recur (str-rest s) pair prod)
+                      (= prod maxprod) (recur (str-rest s) (cons pair acc) prod)
+                      :else (recur (str-rest s) acc maxprod)))))
+(eff *string* '() 0)
+
