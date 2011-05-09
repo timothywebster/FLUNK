@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html">
+<html>
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+		<title>Problem #5 from http://www.cs.berkeley.edu/~hilfingr/programming-contest/f2010-contest.pdf</title>
+		<script src="underscore.js"></script>
+		<script>
+			var reactions = [
+				'6H2O+6CO2=6O2+C6H12O6',
+				'2Na+2H2O=2NaOH+H2',
+				'C6H12O6=3C2H2+3O2',
+				'14C6H12O6=37C2H2+3O2',
+				'CH3COO=2COH+H'
+				];
+			
+			function countAtoms (molecule) {
+				// convert molecule from string to array of individual characters
+				// e.g., 'C6H12O6' becomes ['C', '6', 'H', '1', '2', 'O', '6']
+				var numberOfMolecules = 1,
+					molecule = molecule.split(''),
+					atoms = [],
+					l, atom, count;
+				
+				// regroup the molecule array into meaningful values
+				// e.g., ['H', '1', '2', 'N', 'a'] becomes ['H', '12', 'Na']
+				_.each(molecule, function (m) {
+					if (!atoms.length) { // seed atoms[] with the first item from molecule[]
+						atoms.push(m);
+					} else {
+						l = atoms.length - 1;
+						if (isSymbol(m)) { // it's a symbol?
+							if (isNewSymbol(m)) { // begin a new symbol (uppercase letter)?
+								atoms.push(m);
+							} else { // continuation of an existing symbol
+								atoms[l] = atoms[l] + m;
+							}
+						} else { // it's a number
+							if (isNumeric(atoms[l])) { // continuation of an existing number
+								atoms[l] = atoms[l] + '' + m; // ensure concatenation NOT addition
+							} else { // begin a new number
+								atoms.push(m);
+							}
+						}
+					}
+				});
+				
+				// does atoms[] begin with a number? if so, it's the number of molecules
+				if (isNumeric(atoms[0])) {
+					numberOfMolecules = parseInt(atoms.splice(0, 1), 10);
+				}
+				
+				// accumulate the atom counts into atomsLeft or atomsRight (which was passed as the context ('this') to the countAtoms function)
+				while (atoms.length) {
+					// the first item in atoms[] should be a symbol
+					atom = atoms.splice(0, 1);
+					// is the next item in atoms[] a number? if so, parse it now to determine how many atoms of this type
+					if (atoms.length && isNumeric(atoms[0])) {
+						count = parseInt(atoms.splice(0, 1), 10);
+					} else { // otherwise, we have 1 atom of this type
+						count = 1;
+					}
+					
+					if (this[atom]) { // we've encountered atoms of this within this molecule type already
+						this[atom] = this[atom] + (count * numberOfMolecules);
+					} else {
+						this[atom] = count * numberOfMolecules;
+					}
+				}
+			}
+			
+			function isNewSymbol (a) {
+				return a.match(/[A-Z]/);
+			}
+			
+			function isSymbol (a) {
+				return a.match(/[A-Za-z]/);
+			}
+			
+			function isNumeric (a) {
+				return !isNaN(a);
+			}
+			
+			function isBalanced (l, r) {
+				return _.isEqual(l, r) ? "balances" : "does not balance";
+			}
+			
+			function Counter () {}
+			Counter.prototype.toString = function () {
+				return '[' + _.zip(_.keys(this), _.values(this)).toString() + ']';
+			};
+			
+			function print (s) {
+				document.write('<p>' + s + '</p>');
+			}
+		</script>
+	</head>
+	<body>
+		
+		<h1>Problem #5 from <a href="http://www.cs.berkeley.edu/~hilfingr/programming-contest/f2010-contest.pdf">http://www.cs.berkeley.edu/~hilfingr/programming-contest/f2010-contest.pdf</a></h1>
+		
+		<script>
+			(function () {
+				_.each(reactions, function (f) {
+					// split the reaction equation into left and right components
+					// then find the molecules in each side
+					var eq = f.split('='),
+						moleculesLeft = eq[0].split('+'),
+						moleculesRight = eq[1].split('+'),
+						atomsLeft = new Counter,
+						atomsRight = new Counter;
+					
+					// tally the atoms by type on each side
+					_.each(moleculesLeft, countAtoms, atomsLeft);
+					_.each(moleculesRight, countAtoms, atomsRight);
+					
+					// print the comparison result
+					print(f + ' ' + isBalanced(atomsLeft, atomsRight) + ' : ' + atomsLeft.toString() + ' ' + atomsRight.toString());
+				});
+			}) ();
+		</script>
+		
+	</body>
+</html>
