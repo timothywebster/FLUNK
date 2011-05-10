@@ -1,7 +1,7 @@
 (require 'clojure.contrib.string)
 
 ; split a single compound into a list of elements and subscripts
-(defn chem-split [s] (re-seq #"\d?[A-Z][a-z]|[A-Z]|\d+" s))
+(defn chem-split [s] (re-seq #"[A-Z][a-z]*|\d+" s))
 
 ; parse a string into an int if it looks like an int, otherwise leave it be
 (defn soft-parse [s] (cond (re-matches #"\d+" s) (Integer/parseInt s) :else s))
