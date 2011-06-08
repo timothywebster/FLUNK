@@ -13,9 +13,14 @@
 			];
 
 			function countRoutes (streets, a, b) {
+				if (a === b) {
+					// TODO special case: should be -1 if intersection anchors a two-way street
+					return 0;
+				}
 				// temp: count direct routes only
 				if (_.any(streets, function (street) {return _.isEqual(street, [a, b]);})) {
 					// if this is a two-way street (a->b and b->a) then an infinite number of routes exist
+					// TODO if a route contains *any* two-way streets, then an infinite number of routes exist
 					if (_.any(streets, function (street) {return _.isEqual(street, [b, a]);})) {
 						return -1;
 					}
@@ -80,17 +85,11 @@
 					// console.log(numStreets, maxIntersection, streets.toString());
 
 					// generate our matrix of route counts
-
 					for (i = 0; i <= maxIntersection; i++) {
 						routes.push([]);
 						for (j = 0; j <= maxIntersection; j++) {
-							if (i === j) {
-								// TODO special case: should be -1 if intersection anchors a two-way street. why?!?
-								routes[i].push(0);
-							} else {
-								// calculate the number of routes between intersections i and j
-								routes[i].push(countRoutes(streets, i, j));
-							}
+							// calculate the number of routes between intersections i and j
+							routes[i].push(countRoutes(streets, i, j));
 						}
 					}
 
