@@ -1,0 +1,105 @@
+﻿<!DOCTYPE html">
+<html>
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+		<title>Problem #2 from http://www.cs.berkeley.edu/~hilfingr/programming-contest/f2010-contest.pdf</title>
+		<script src="underscore.js"></script>
+		<script>
+			// our data set
+			var cities = [
+				'7 0 1 0 2 0 4 2 4 2 3 3 1 4 3',
+				'5				0 2				0 1 1 5 2 5 2 1',
+				'9				0 1 0 2 0 3				0 4 1 4 2 1				2 0				3 0				3 1'
+			];
+
+			function countRoutes (streets, a, b) {
+				// temp: count direct routes only
+				if (_.any(streets, function (street) {return _.isEqual(street, [a, b]);})) {
+					// if this is a two-way street (a->b and b->a) then an infinite number of routes exist
+					if (_.any(streets, function (street) {return _.isEqual(street, [b, a]);})) {
+						return -1;
+					}
+					return 1;
+				} else {
+					return 0;
+				}
+			}
+
+			// utility stuff
+			String.prototype.parseInt = function (radix) {
+				return parseInt(this, radix || 10);
+			};
+
+			function printMatrix (matrix, size) {
+				var i, j, row;
+
+				for (i = 0; i <= size; i++) {
+					row = [];
+					for (j = 0; j <= size; j++) {
+						row.push(matrix[i][j]);
+					}
+					print(row.join(' '));
+				}
+			}
+
+			function print (s) {
+				document.write('<p>' + s + '</p>');
+			}
+		</script>
+	</head>
+	<body>
+		
+		<h1>Problem #2 from <a href="http://www.cs.berkeley.edu/~hilfingr/programming-contest/f2010-contest.pdf">http://www.cs.berkeley.edu/~hilfingr/programming-contest/f2010-contest.pdf</a></h1>
+		
+		<script>
+			(function () {
+				_.each(cities, function (city, index) {
+					var i, j, numStreets,
+						maxIntersection,
+						streets = [],
+						routes = [],
+						matrix = [];
+
+					// normalize whitespace and convert to array
+					city = city.replace(/\s+/g, ' ').split(' ');
+
+					// let's work with integers...why not
+					city = _.invoke(city, 'parseInt');
+
+					// grab 'number of streets' value
+					numStreets = city.shift();
+
+					// determine 'largest' intersection
+					maxIntersection = _.max(city);
+
+					// create array of streets
+					while (city.length) {
+						streets.push(city.splice(0, 2));
+					}
+
+					// console.log(numStreets, maxIntersection, streets.toString());
+
+					// generate our matrix of route counts
+
+					for (i = 0; i <= maxIntersection; i++) {
+						routes.push([]);
+						for (j = 0; j <= maxIntersection; j++) {
+							if (i === j) {
+								// TODO special case: should be -1 if intersection anchors a two-way street. why?!?
+								routes[i].push(0);
+							} else {
+								// calculate the number of routes between intersections i and j
+								routes[i].push(countRoutes(streets, i, j));
+							}
+						}
+					}
+
+					print('matrix for city ' + index);
+
+					printMatrix(routes, maxIntersection);
+				});
+			}) ();
+		</script>
+		
+	</body>
+</html>
