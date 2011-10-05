@@ -1,0 +1,232 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+		<title>Problem #2 from http://www.cs.berkeley.edu/~hilfingr/programming-contest/f2010-contest.pdf</title>
+		<script src="underscore.js"></script>
+		<script>
+			
+
+			// utility stuff
+			String.prototype.parseInt = function (radix) {
+				return parseInt(this, radix || 10);
+			};
+
+			// a Matrix object
+			function Matrix (rows, columns, seed) {
+				var i, j;
+				if (typeof seed === 'undefined') {
+					seed = '';
+				}
+				this._m = [];
+				for (i = 0; i <= rows; i++) {
+					this._m.push([]);
+					for (j = 0; j <= columns; j++) {
+						this._m[i].push(seed);
+					}
+				}
+			}
+			Matrix.prototype.set = function (row, column, value) {
+				this._m[row][column] = value;
+			};
+			Matrix.prototype.get = function (row, column) {
+				return this._m[row][column];
+			};
+			Matrix.prototype.each = function () {
+				var arg = _.toArray(arguments),
+					fn = arg.shift(),
+					that = this;
+
+				_.each(this._m, function (row, rindex) {
+					_.each(row, function (cell, cindex) {
+						// clone the original arguments and append the row and column index values
+						var a = _.clone(arg);
+						a.push(rindex);
+						a.push(cindex);
+						that.set(rindex, cindex, fn.apply(null, a));
+					});
+				});
+			};
+			Matrix.prototype.print = function () {
+				_.each(this._m, function (row) {
+					print(row.join(' '));
+				});
+			};
+			Matrix.prototype.log = function () {
+				console.log(this._m);
+			};
+
+			function print (s) {
+				document.write('<p>' + s + '</p>');
+			}
+		</script>
+	</head>
+	<body>
+		
+		<h1>Problem #2 from <a href="http://www.cs.berkeley.edu/~hilfingr/programming-contest/f2010-contest.pdf">http://www.cs.berkeley.edu/~hilfingr/programming-contest/f2010-contest.pdf</a></h1>
+		
+		<script>
+			(function () {
+				// our data set
+				var cities = [
+					'7 0 1 0 2 0 4 2 4 2 3 3 1 4 3'
+					,'5				0 2				0 1 1 5 2 5 2 1'
+					,'9				0 1 0 2 0 3				0 4 1 4 2 1				2 0				3 0				3 1'
+				];
+
+				function countRoutes (streets, i1, i2) {
+					// streets: a nested array of street specifications
+					// i1: 
+					// return;
+					if (i1 === i2) {
+						// TODO special case: should be -1 if intersection anchors a two-way street
+						return 0;
+					}
+					// temp: count direct routes only
+					if (_.any(streets, function (street) {return _.isEqual(street, [i1, i2]);})) {
+						// if this is a two-way street (a->b and b->a) then an infinite number of routes exist
+						// TODO if a route contains *any* two-way streets, then an infinite number of routes exist
+						if (_.any(streets, function (street) {return _.isEqual(street, [i2, i1]);})) {
+							return -1;
+						}
+						return 1;
+					} else {
+						return 0;
+					}
+				}
+
+				_.each(cities, function (city, index) {
+					var i, j,
+						numStreets,
+						maxIntersection,
+						routeCounter,
+						streets = [],
+						routes = [];
+
+					// normalize whitespace and convert to array
+					city = city.replace(/\s+/g, ' ').split(' ');
+
+					// let's work with integers...why not
+					city = _.invoke(city, 'parseInt');
+
+					// grab 'number of streets' value *this value is basically worthless*
+					numStreets = city.shift();
+
+					// determine 'largest' intersection
+					maxIntersection = _.max(city);
+
+					// create array of streets
+					while (city.length) {
+						streets.push(city.splice(0, 2));
+					}
+
+					// transform streets array into a vaguely tree-like structure
+					_.each(streets, function (street) {
+						if (routes[street[0]]) {
+							routes[street[0]].push(street[1]);
+						} else {
+							routes[street[0]] = [street[1]];
+						}
+					});
+
+					// console.log(tree);
+
+					// expand the tree to include extended routes so we can count the leaves
+					routes = expandRoutes(routes);
+
+					// console.log(routes);
+
+					// create a Matrix of intersections
+					routeCounter = new Matrix(maxIntersection, maxIntersection, 0);
+
+					
+
+					// calculate number of routes for each cell in our matrix of intersections
+					routeCounter.each(countRoutes, streets, routes);
+
+					// print('matrix for city ' + index);
+
+					// routeCounter.print();
+				});
+
+				function expandRoutes (routeList) {
+					var routes = [];
+					_.each(routeList, function (branch, key) {
+						routes[key] = serializeRoutes(routeList, key, []);
+					});
+					return routes;
+				}
+
+				function serializeRoutes (routeList, key, s) {
+					_.each(routeList[key], function (intersection) {
+						// check for two-way streets to prevent infinite recursion
+						if (!!(routeList[intersection] && _.include(routeList[intersection], key))) {
+							s.push([key, intersection, -1]);
+						} else {
+							s.push(intersection);
+							serializeRoutes(routeList, intersection, s);
+						}
+					});
+					return s;
+				}
+
+				var tree = [
+					[1, 2, 4],
+					undefined,
+					[3, 4],
+					[1],
+					[3]
+				];
+
+				var tree2 = [
+					[2, 1],
+					[5],
+					[5, 1],
+					undefined,
+					undefined,
+					undefined
+				];
+
+				var tree3 = [
+					[1, 2, 3, 4],
+					[4],
+					[0],
+					[0, 1],
+					undefined
+				];
+			}) ();
+		</script>
+
+		<h2>unfinished, showing my work so far</h2>
+
+		<p>original data:</p>
+
+		<p>7 0 1 0 2 0 4 2 4 2 3 3 1 4 3</p>
+
+		<p>becomes:</p>
+
+		<p>[7, 0, 1, 0, 2, 0, 4, 2, 4, 2, 3, 3, 1, 4, 3]</p>
+
+		<p>becomes:</p>
+
+		<p>[0, 1, 0, 2, 0, 4, 2, 4, 2, 3, 3, 1, 4, 3]</p>
+
+		<p>becomes:</p>
+
+		<p>[ [0, 1], [0, 2], [0, 4], [2, 4], [2, 3], [3, 1], [4, 3] ]</p>
+
+		<p>flatten the data structure into a list of lists:</p>
+
+		<p>[ [1, 2, 4], undefined, [4, 3], [1], [3] ]</p>
+
+		<p>recursively follow all routes to flesh out the sub-lists:</p>
+
+		<p>[ [1, 2, 4, 3, 1, 3, 1, 4, 3, 1], undefined, [4, 3, 1, 3, 1], [1], [3, 1] ]</p>
+
+		<p>which should be transformed into the matrix output by counting the "leaves" in each sub-list:</p>
+
+		<p>for example: 0->0 = 0, 0->1 = 4, 0->2 = 1, 0->3 = 3, 0->4 = 2, 2->1 = 2, 2->3 = 2 </p>
+
+		
+	</body>
+</html>
